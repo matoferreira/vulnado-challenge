@@ -35,7 +35,8 @@ public class Postgres {
             Statement stmt = c.createStatement();
 
             // Create Schema
-            stmt.executeUpdate("CREATE TABLE IF NOT EXISTS users(user_id VARCHAR (36) PRIMARY KEY, username VARCHAR (50) UNIQUE NOT NULL, password VARCHAR (50) NOT NULL, created_on TIMESTAMP NOT NULL, last_login TIMESTAMP)");
+            stmt.executeUpdate("CREATE TABLE IF NOT EXISTS users(user_id VARCHAR (36) PRIMARY KEY, username VARCHAR (50) UNIQUE NOT NULL, password VARCHAR (64) NOT NULL, created_on TIMESTAMP NOT NULL, last_login TIMESTAMP)");
+            stmt.executeUpdate("ALTER TABLE users ALTER COLUMN password TYPE VARCHAR (64)");
             stmt.executeUpdate("CREATE TABLE IF NOT EXISTS comments(id VARCHAR (36) PRIMARY KEY, username VARCHAR (36), body VARCHAR (500), created_on TIMESTAMP NOT NULL)");
 
             // Clean up any existing data
@@ -58,13 +59,13 @@ public class Postgres {
         }
     }
 
-    // Java program to calculate MD5 hash value
+    // Java program to calculate SHA-256 hash value
     public static String md5(String input)
     {
         try {
 
-            // Static getInstance method is called with hashing MD5
-            MessageDigest md = MessageDigest.getInstance("MD5");
+            // Static getInstance method is called with hashing SHA-256
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
 
             // digest() method is called to calculate message digest
             //  of an input digest() return array of byte
@@ -75,7 +76,7 @@ public class Postgres {
 
             // Convert message digest into hex value
             String hashtext = no.toString(16);
-            while (hashtext.length() < 32) {
+            while (hashtext.length() < 64) {
                 hashtext = "0" + hashtext;
             }
             return hashtext;
