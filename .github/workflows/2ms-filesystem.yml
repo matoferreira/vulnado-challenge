@@ -1,0 +1,50 @@
+name: 2ms filesystem
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+  security-events: write
+
+jobs:
+  scan:
+    name: Scan files
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+
+      - name: Run 2ms
+        run: |
+          mkdir -p artifacts
+          docker run --rm \
+            --user "$(id -u):$(id -g)" \
+            -v "$GITHUB_WORKSPACE":"$GITHUB_WORKSPACE" \
+            -w "$GITHUB_WORKSPACE" \
+            checkmarx/2ms \
+            filesystem --path . \
+            --report-path artifacts/2ms-filesystem.json \
+            --report-path artifacts/2ms-filesystem.sarif \
+            --ignore-on-exit results
+
+      - name: Upload JSON and SARIF reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: 2ms-filesystem-reports
+          path: |
+            artifacts/2ms-filesystem.json
+            artifacts/2ms-filesystem.sarif
+          if-no-files-found: error
+
+      - name: Upload SARIF
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: artifacts/2ms-filesystem.sarif
+          category: 2ms-filesystem
