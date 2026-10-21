@@ -13,7 +13,8 @@ services:
       - PGHOST=db:5432
       - PGUSER=postgres
     depends_on:
-      - "db"
+      db:
+        condition: service_healthy
 
   client:
     build: client
@@ -21,10 +22,15 @@ services:
       - 1337:80
 
   db:
-    image: postgres
+    image: postgres:16
     environment:
       - POSTGRES_PASSWORD=vulnado
       - POSTGRES_DB=vulnado
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d vulnado"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
 
   internal_site:
     build: internal_site
