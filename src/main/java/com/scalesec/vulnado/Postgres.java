@@ -11,6 +11,7 @@ import java.util.UUID;
 
 public class Postgres {
 
+    // TODO: Add focused tests for PostgreSQL JDBC driver integration.
     public static Connection connection() {
         try {
             Class.forName("org.postgresql.Driver");
